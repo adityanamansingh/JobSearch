@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup
 
 from typing import List, Tuple
 
+
 class JobSearch:
     """
     Initializes the JobSearch with a list of locations and positions
@@ -30,7 +31,33 @@ class JobSearch:
         
         """
         self.jobType = jobType
-        pass
+
+        indeedURL = []
+        if self.rad is None and self.jobType is None:
+            for i, jobTitle in enumerate(self.positionList):
+                for j, location in enumerate(self.locationList):
+                    indeedURL.append(f"https://www.indeed.com/jobs?q={jobTitle}&l={location}")
+        elif self.rad is None:
+            for i, jobTitle in enumerate(self.positionList):
+                for j, location in enumerate(self.locationList):
+                    indeedURL.append(f"https://www.indeed.com/jobs?q={jobTitle}&l={location}&jt={self.jobType}")
+        else:
+            for i, jobTitle in enumerate(self.positionList):
+                for j, location in enumerate(self.locationList):
+                    indeedURL.append(f"https://www.indeed.com/jobs?q={jobTitle}&l={location}&radius={self.rad}&jt={self.jobType}")
+
+        r = requests.get(indeedURL[0])
+        print(indeedURL[0])
+        soup = BeautifulSoup(r.content, "html.parser")
+        results = soup.find(id="resultsCol")
+        print(results.prettify())
+        # look for <td id="resultsCol">
+        # nested is <a id="jobPostingsAnchor" tabindex="-1"></a> containing all jop postings
+        # All jobs are contained like with class="jobsearch-SerpJobCard unifiedRow row result clickcard"
+        # Each job has their own CSS selector which acts as a unique identifier
+        #for URL in indeedURL:
+            #r = requests.get(URL)
+            #print(r.text)
 
 
     """
@@ -57,20 +84,7 @@ class JobSearch:
     jobType: internship, fulltime, parttime, temporary, contract
     """
     def wordFrequency(self, displayCount: int=-1) -> List[Tuple[str, int]]:
-        if self.rad is None and self.jobType is None:
-            for i, jobTitle in enumerate(self.positionList):
-                for j, location in enumerate(self.locationList):
-                    indeedURL = f"https://www.indeed.com/jobs?q={jobTitle}&l={location}"
-                    print(indeedURL)
-        elif self.rad is None:
-            for i, jobTitle in enumerate(self.positionList):
-                for j, location in enumerate(self.locationList):
-                    indeedURL = f"https://www.indeed.com/jobs?q={jobTitle}&l={location}&jt={self.jobType}"
-                    print(indeedURL)
-        else:
-            for i, jobTitle in enumerate(self.positionList):
-                for j, location in enumerate(self.locationList):
-                    indeedURL = f"https://www.indeed.com/jobs?q={jobTitle}&l={location}&radius={self.rad}&jt={self.jobType}"
+        pass
 
     """
     resumeWeights is a txt document listing key words and relative weights
