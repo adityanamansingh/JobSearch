@@ -5,4 +5,4 @@ Ideally, the scraped information should be filtered, because job websites don't 
 
 I also wish to expand the application of the web scraping to identify jobs that I may be qualified for. Perhaps cross-referencing my resume and skills with the job decriptions and providing weights to each similarity. For instance, if the job posting is not an internship, it should automatically be a 0% match because it wouldn't be ideal or probable for me to secure a full-time job in college. Soft skills should probably carry a weight, but a match with a programming language should probably carry more weight as I am much more likely to be hired for a job that can leverage my established technical skillset. 
 
-![Alt Text] (/jobsearch/IndeedJSHTML2.png?raw=true)
+![Alt Text](/jobsearch/IndeedJSHTML2.png?raw=true)
