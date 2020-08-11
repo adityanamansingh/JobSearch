@@ -1,8 +1,9 @@
 import requests
 from bs4 import BeautifulSoup
-from typing import List, Tuple
+from typing import List, Tuple, Any
 from collections import Counter
 import re
+import textwrap
 
 
 class JobPost:
@@ -54,6 +55,9 @@ class JobSearch:
         """
         self.jobType = jobType
         self.wordCounter = Counter()
+        # Parameter for blacklist functionality. If a blacklist was specified, it would have to be turned into lowercase
+        # in order to help with word matching
+        self.JSDescriptionBlacklist = []
 
         """
         Indeed.com Job Search Web Scraper
@@ -65,10 +69,9 @@ class JobSearch:
 
         # To count the number of jobs parsed
         self.resultCount = 0
-        self.indeedJobIsSeen = set()
+        self._indeedJobIsSeen = set()
         self.wordCounter += self._getIndeedWordFrequency(indeedURLs)
 
-        print('\n', "Job Count:", self.resultCount)
 
     """
     Intended for internal use to modularize code
@@ -88,7 +91,9 @@ class JobSearch:
         # First two characters "p_" from id attribute are stripped to allow for appending into URL
 
         indeedJobURL = f"https://www.indeed.com/viewjob?jk={jobID}"
+
         indeedJobHTML = requests.get(indeedJobURL)
+
         indeedJobSoup = BeautifulSoup(indeedJobHTML.content, "html.parser")
         jobDescription = indeedJobSoup.find("div", id="jobDescriptionText")
 
@@ -140,10 +145,12 @@ class JobSearch:
     def _getIndeedJobPosts(self, URL: str) -> List["bs.elements.Tag"]:
         jobPostings = []
         # returns entire HTML text for given URL
+
         indeedJSHTML = requests.get(URL)
+
         # Creates a BeautifulSoup object for HTML parsing with the 'html.parser' in the Python library
         indeedJSSoup = BeautifulSoup(indeedJSHTML.content, "html.parser")
-        jobCount = int(indeedJSSoup.find("div", id="searchCountPages").text.strip().split()[3])
+        jobCount = int(indeedJSSoup.find("div", id="searchCountPages").text.strip().split()[3].replace(",", ""))
         # Each page has 15 jobs, jobCount // 15 returns the number of pages - 1 if jobCount % 15 != 0
         resultsPerPage = 15
         pages = int(jobCount) // resultsPerPage
@@ -163,6 +170,7 @@ class JobSearch:
                 newURL = URL + f"&start={searchPosition}"
 
             indeedJSHTML = requests.get(newURL)
+
             indeedJSSoup = BeautifulSoup(indeedJSHTML.content, "html.parser")
             # Parses HTML text for resultsCol, or where the job results for the URL are found
             results = indeedJSSoup.find(id="resultsCol")
@@ -177,13 +185,16 @@ class JobSearch:
             # Builds a list of HTML tags corresponding to individual jobs based on Indeed.com search parameters
             jobPostings = self._getIndeedJobPosts(URL)
             for jobHTML in jobPostings:
-                # Loading in console
-                self._loading()
 
                 jobID = jobHTML["id"][2:]
                 # If we have not seen the job before, parse the JobPost
-                if jobID not in self.indeedJobIsSeen:
-                    self.indeedJobIsSeen.add(jobID)
+                if jobID not in self._indeedJobIsSeen:
+                    self.resultCount += 1
+
+                    # Loading in console
+                    # self._loading()
+                    self._indeedJobIsSeen.add(jobID)
+
                     """               
                     Parses a single indeed job and returns a JobPost object
                     jobPost could be stored as a class attribute in a list of JobPost Objects for future reference
@@ -197,7 +208,6 @@ class JobSearch:
                         jobWordCounter = jobPost.wordCounts()
 
                         # This block of code is to handle job searching if a blacklist is included
-                        self.JSDescriptionBlacklist = []
                         blacklisted = False
                         for word in self.JSDescriptionBlacklist:
                             if word in jobWordCounter:
@@ -216,7 +226,6 @@ class JobSearch:
     """
     def _loading(self):
         rowLength = 20
-        self.resultCount += 1
         print(' . ', end='')
         if self.resultCount % rowLength == 0:
             print()
@@ -228,14 +237,19 @@ class JobSearch:
     List contents are limited by displayCount, if there is no limit specified (-1), wordFrequency will return all words 
     and their frequency
     """
-    def getWordFrequency(self, displayCount: int = 0, blacklist: List[str] = None) -> List[Tuple[str, int]]:
+    def getWordFrequency(self, displayCount: int = 0, blacklist: List[str] = None) -> List[Tuple[Any, int]]:
         if blacklist is None:
             blacklist = []
+
+        # Lowercasing the words to allow for proper hashing
+        for i, word in blacklist:
+            blacklist[i] = word.lower()
 
         if len(self.wordCounter) <= displayCount:
             return self.wordCounter.most_common()
 
         frequencyCounts = Counter()
+
         # Constructs a new Counter object with blacklisted words removed
         if displayCount < 1:
             for key, value in self.wordCounter.most_common():
@@ -248,9 +262,10 @@ class JobSearch:
             if key not in blacklist:
                 frequencyCounts[key] = value
                 displayed += 1
-                # This statement is guaranteed to occur if a displayCount is passed that is < the size of the Counter
                 if displayed == displayCount:
-                    return frequencyCounts.most_common()
+                    break
+
+        return frequencyCounts.most_common()
 
     def getWord(self, word: str) -> int:
         return self.wordCounter[word.lower()]
@@ -271,8 +286,3 @@ class JobSearch:
     """
     def companyFit(self, resumeWeights: str) -> List[Tuple[str, float]]:
         pass
-
-
-js = JobSearch(["Software Engineer Intern", "Software Developer Intern"], ["San Francisco, CA", "San Jose, CA", "Long Beach, CA"], "internship")
-print(js.getWordFrequency())
-print("Python:", js.getWord("pyTHon"))
