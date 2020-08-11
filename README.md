@@ -62,24 +62,24 @@ After parsing through 2213 software engineering focused internships across the U
 Here are a few of the most frequently used words that could help in a tech interns resume:
 <center>
 
-    ---| Useful Words In A Tech Resume |---
-    :-:|:-:|:-:
-    Amazon: 1099 | Teams: 1078 | Java: 727
-    Microsoft: 690 | Creative: 673 | AWS: 612
-    C++: 587 | Communications: 534 | Cloud: 519
-    Hardware: 510 | Passion: 483 | Object-Oriented: 472
-    Python: 459 | Scale: 454 | Analytics 436
-    Reliability: 434 | Analytical: 421 | Passionate: 412
-    Collaborative: 407 | Database: 407 | C#: 401
-    Independently: 393 | Flexible: 381 | Fast-paced: 380
-    Communicate: 369 | Positive: 369 | Bachelor's: 368
-    Dyanamic: 357 | Collaboration: 354 | Interpersonal: 331
-    Facebook: 361 | Scaling: 316 | Algorithms: 299
-    Motivated: 275 | Driven: 240 | Linux: 231
-    JavaScript: 222 | AI: 219 | Initiative: 208
-    Reliable: 208 | Efficiency: 200 | Problem-solving: 194
-    Efficient: 187 | Google: 187 | Embedded: 185
-    Networks: 185 | Paypal: 181 | Statistics: 171
+---| Useful Words In A Tech Resume |---
+:-:|:-:|:-:
+Amazon: 1099 | Teams: 1078 | Java: 727
+Microsoft: 690 | Creative: 673 | AWS: 612
+C++: 587 | Communications: 534 | Cloud: 519
+Hardware: 510 | Passion: 483 | Object-Oriented: 472
+Python: 459 | Scale: 454 | Analytics 436
+Reliability: 434 | Analytical: 421 | Passionate: 412
+Collaborative: 407 | Database: 407 | C#: 401
+Independently: 393 | Flexible: 381 | Fast-paced: 380
+Communicate: 369 | Positive: 369 | Bachelor's: 368
+Dyanamic: 357 | Collaboration: 354 | Interpersonal: 331
+Facebook: 361 | Scaling: 316 | Algorithms: 299
+Motivated: 275 | Driven: 240 | Linux: 231
+JavaScript: 222 | AI: 219 | Initiative: 208
+Reliable: 208 | Efficiency: 200 | Problem-solving: 194
+Efficient: 187 | Google: 187 | Embedded: 185
+Networks: 185 | Paypal: 181 | Statistics: 171
     
 </center>
 
