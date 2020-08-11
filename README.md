@@ -20,20 +20,64 @@
 
   In all, 8 job titles in 9 cities, averaging around 50-100 results each search, will produce 3600 - 7200 different job descriptions to be parsed. Each job having somewhere in the ball park of 250 words, will amount to around 900,000 - 1.8 million words analyzed and utilized to define the most desireable traits and skills in software development for interns.
 
-## JobSearch Object Processing
-  Job descriptions will be saved in a txt document upon creation of a **JobSearch** object. Processing the job description information will require:
-  - Checking for duplicates
-      - If a job ID has not been seen, it is a new job and should be saved and analyzed
-          1. Insertion and element indexing are O(1) with a set and it does not allow duplicates by nature of design. A set will hold all job ID values
-  - Analyzing and Saving
-      - Writing data to a txt file is straight forward, and to aid in processing in the future, text should be formatted to allow for easy parsing.
-          1. Each entry should begin with a line solely dedicated to job ID (This format may change in the future to allow for unique identification between websites)
-          2. The next portion of lines should simply be the text from the job description
-          3. There should also be a way to signify that a job entry is complete
-      - The job descriptions must be parsed if they are not duplicates, ensuring that a count of all instances of a word are recorded
-          1. On the other hand, a hash map or the subclass "Counter" in Python is better suited to track instances of words (O(1) as well). Considering that I am not concerned with case sensitivity, all words shall be entered in lowercase format to ensure that words like "Software" and "software" add to the same count. I could either operate on the first character of every word for slightly better performance, or I could ensure that the entire word was lowercase to improve the accuracy of the data. <sup>1</sup>
+## JobSearch Object
+Used to scrape information from job posting websites: Job titles, locations, companies, and descriptions
+Attributes:
+- positionList: list of str specifying the positions you are seeking
+- locationList: : list of str specifying the locations you would be willing to work
+- jobType: optional parameter that can specify the kind of job you are looking for
+- rad: optional parameter that can specify how far from your desired locations you'd like to work
+- wordCounter: Counter object with every word that has been seen within a job search
+- resultsCounts: The number of unique jobs parsed
+
+Methods:
+- __init__(self, positionList: List[str], locationList: List[str], jobType: str = None, rad: int = None)
+    1. Purpose: 
+        - preparing a JobSearch object for analysis, parses through all jobs related to specified search parameters additional functionality for a job description blacklist is already prepared if a user would like to toss a job description from parsing if it contained certain blacklisted words
+    2. Parameters:
+        - positionList: list of str specifying the positions you are seeking
+        - locationList: list of str specifying the locations you would be willing to work
+        - jobType: optional parameter that can specify the kind of job you are looking for
+            1. The current functionality of the JobSearch object is for Indeed.com with the following job types: fulltime, parttime, internship, temporary, and contract
+        - rad: optional parameter that can specify how far from your desired locations you'd like to work
+            1. Additional functionality to allow for a Tuple[str, int] could be allowed instead of simply a List[str] for locationList to allow a user to specify a radius from a distinct city
+    3. Other Attributes:
+        - wordCounter: Counter object with every word that has been seen within a job search
+        - resultsCount: The number of unique jobs parsed
+- getWordFrequency(self, displayCount: int = 0, blacklist: List[str] = None) -> Counter
+    1. Purpose: 
+        - Returns a Counter object that specifies how many instances of (displayCount) words have been seen. Allows for a blacklist to be passed to suppress certain words from being displayed. For instance, if the user did not want to see results for the word "Java", they could specify such in the blacklist.
+    2. Parameters:
+        - displayCount: int specifying how many of the most commonly seen words to display, if displayCount is < 1, all results are displayed
+        - blacklist: list of str specifying words to omit from results shown
+- getWord(self, word: str) -> int
+    1. Purpose: 
+        - returns the amount of times an instance of the specified word is seen
+    2. Parameters:
+        - word: str that specifies which word you would like to examine for instances in the job search
+        
+## JobPostObject
+Used to store information about a job. Added capability to parse through job description for word frequencies
+Attributes:
+- title: str specifying the title of the job post
+- location: str specifying the location of the job
+- company: str specifying the company offering the job
+- description: str describing the respective job position
+
+Methods:
+- __init__(self, title: str = "", location: str = "", company: str = "", description: str = "")
+    1. Purpose:
+        - Passing parameters into class attributes
+    2. Parameters:
+        - title: str specifying the title of the job post
+        - location: str specifying the location of the job
+        - company: str specifying the company offering the job
+        - description: str describing the respective job position
+- wordCounts(self) -> Counter
+    1. Purpose:
+        - Builds a Counter object that tracks the frequency that words are used
 
 ## Word Cloud Creation
-  The word cloud will be created very simply. It will consist of X number of most frequently seen words and font size will reflect relative usage. The word cloud text will *fit* into different shapes with differing fonts and text colors. I will either implement with JavaFX or experiment with a Python GUI framework.
+The word cloud will be created very simply. It will consist of X of most frequently seen words and font size will reflect relative usage. The word cloud text will *fit* into different shapes with differing fonts and text colors. I will either implement with JavaFX or experiment with a Python GUI framework.
 
 <sup>1</sup> In Python, a "Counter" is a container that works exactly like a dictionary (hash map) except values represent occurances or "counts." Using the indexing operator will return a 0 if the element is not contained within the container rather than a KeyError while using a dictionary. This is beneficial if you wanted to see how many times a word is mentioned.
