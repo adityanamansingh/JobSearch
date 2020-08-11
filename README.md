@@ -58,7 +58,7 @@ Methods:
     1. Purpose:
         - Builds a Counter object that tracks the frequency that words are used
 # Results
-After parsing through 2213 software engineering positions across the United States, I saw some interesting trends.
+After parsing through 2213 software engineering positions across the United States and over 900,000 words, I saw some interesting trends.
 Here are a few of the most frequently used words that could help in a techie's resume:
 
 
