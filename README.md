@@ -62,7 +62,7 @@ After parsing through 2213 software engineering focused internships across the U
 Here are a few of the most frequently used words that could help in a tech interns resume:
 
 ---| Useful Words In A Tech Resume |---
----|---|---
+:-:|:-:|:-:
 Amazon: 1099 | Teams: 1078 | Java: 727
 Microsoft: 690 | Creative: 673 | AWS: 612
 C++: 587 | Communications: 534 | Cloud: 519
