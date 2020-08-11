@@ -58,8 +58,8 @@ Methods:
     1. Purpose:
         - Builds a Counter object that tracks the frequency that words are used
 # Results
-After parsing through 2213 software engineering focused internships across the United States, I saw some interesting trends.
-Here are a few of the most frequently used words that could help in a tech interns resume:
+After parsing through 2213 software engineering positions across the United States, I saw some interesting trends.
+Here are a few of the most frequently used words that could help in a techie's resume:
 
 
 ---| Useful Words In A Tech Resume |---
