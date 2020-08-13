@@ -3,7 +3,6 @@ from bs4 import BeautifulSoup
 from typing import List, Tuple, Any
 from collections import Counter
 import re
-import textwrap
 
 
 class JobPost:
@@ -14,6 +13,12 @@ class JobPost:
         self.description = description
         # No ID attribute to improve scalability, Indeed.com uses IDs, but other job posting sites may not
 
+    """
+    ============================================
+    Tracks instances of words in a single JobPost
+    ============================================
+    """
+    
     def wordCounts(self) -> Counter:
         # Counter object created for every individual job description
         # Allows for blacklisting of words to discard job descriptions if they mention certain keywords
@@ -36,13 +41,13 @@ class JobPost:
 
 
 class JobSearch:
-    # Initializes the JobSearch with a list of locations, positions OPTIONAL: job type and radius
+    # Initializes the JobSearch with a list of locations, and positions OPTIONAL: job type and radius
     def __init__(self, positionList: List[str], locationList: List[str], jobType: str = None, rad: int = None):
 
         self.positionList = positionList
         self.locationList = locationList
 
-        # Error handling for rad and jobType
+        # Error handling for rad and jobType (dependent on other site search parameters)
         """
         radii = [5, 15, 25, 50, 100]
         if rad not in radii:
@@ -55,15 +60,10 @@ class JobSearch:
         """
         self.jobType = jobType
         self.wordCounter = Counter()
-        # Parameter for blacklist functionality. If a blacklist was specified, it would have to be turned into lowercase
-        # in order to help with word matching
+        # Parameter for blacklist functionality. If a blacklist was specified in the parameters, it would have to be turned into lowercase
+        # in order to help with hashing
         self.JSDescriptionBlacklist = []
 
-        """
-        Indeed.com Job Search Web Scraper
-        Parses for: Job Title, Company, Location, and Job Description
-        Utilizes a CSS selector system for uniquely identifying jobs locally within site
-        """
         # local variable for storing the starting point of indeed searches
         indeedURLs = self._makeIndeedURLs()
 
@@ -72,16 +72,17 @@ class JobSearch:
         self._indeedJobIsSeen = set()
         self.wordCounter += self._getIndeedWordFrequency(indeedURLs)
 
-
     """
+    ============================================
     Intended for internal use to modularize code
     Examines a jobs HTML attributes and stores them in a JobPost object for further analysis
+    ============================================
     """
+    
     def _parseIndeedJob(self, jobHTML: "bs4.elements.Tag", jobID: str) -> JobPost:
         # Each job will have their information stored in the tags and classes listed below
         # job is a Tag object in the BS4 library, with an attribute "id", which is the unique specifier for each job
         # Each "id" is a CSS selector to allow for organization of different elements in the design
-        # First two characters "p_" from id attribute are stripped to allow for appending into URL
         jobTitle = jobHTML.find("a", class_="jobtitle")
         jobCompany = jobHTML.find("span", class_="company")
         jobLocation = jobHTML.find('span', class_="location")
@@ -103,10 +104,13 @@ class JobSearch:
         return JobPost(jobTitle.text.strip(), jobCompany.text.strip(), jobLocation.text.strip(), jobDescription.text)
 
     """
+    ============================================
     Intended for internal use to modularize code
     Takes the positionList and locationList passed to the constructor of the JobSearch object and builds
     a list of URLs for indeed.com usage
+    ============================================
     """
+    
     def _makeIndeedURLs(self) -> List[str]:
         indeedPositionList = [str] * len(self.positionList)
         for i, jobTitle in enumerate(self.positionList):
@@ -139,9 +143,12 @@ class JobSearch:
         return indeedURLs
 
     """
+    ============================================
     Intended for internal use to modularize code
     Returns a list of HTML tags corresponding to the Indeed.com search URL
+    ============================================
     """
+    
     def _getIndeedJobPosts(self, URL: str) -> List["bs.elements.Tag"]:
         jobPostings = []
         # returns entire HTML text for given URL
@@ -178,15 +185,23 @@ class JobSearch:
             jobPostings += results.find_all("div", class_="jobsearch-SerpJobCard")
 
         return jobPostings
-
+    
+    """
+    ============================================
+    Intended for internal use to modularize code
+    Tracks instances of words for Indeed.com portion of a Job Search
+    ============================================
+    """
+    
     def _getIndeedWordFrequency(self, indeedURLs: List[str]) -> Counter:
         indeedWordCounter = Counter()
         for URL in indeedURLs:
             # Builds a list of HTML tags corresponding to individual jobs based on Indeed.com search parameters
             jobPostings = self._getIndeedJobPosts(URL)
             for jobHTML in jobPostings:
-
+                # First two characters "p_" from id attribute are stripped to allow for appending into URL
                 jobID = jobHTML["id"][2:]
+                
                 # If we have not seen the job before, parse the JobPost
                 if jobID not in self._indeedJobIsSeen:
                     self.resultCount += 1
@@ -203,8 +218,9 @@ class JobSearch:
                     jobPost = self._parseIndeedJob(jobHTML, jobID)
 
                     # Sometimes an HTML element will return as None if the element isn't found,
-                    # leaving a job posting incomplete.
-                    if jobPost is not None:
+                    # leaving a job posting incomplete. If a job post is incomplete, by default, the JobPost object's
+                    # attributes are all initialized to ""
+                    if jobPost.title != "":
                         jobWordCounter = jobPost.wordCounts()
 
                         # This block of code is to handle job searching if a blacklist is included
@@ -221,9 +237,12 @@ class JobSearch:
         return indeedWordCounter
 
     """
+    ============================================
     Intended for internal use to modularize code
     Allows for visualization of job search progress, printing a " . " for each job parsed
+    ============================================
     """
+    
     def _loading(self):
         rowLength = 20
         print(' . ', end='')
@@ -231,12 +250,15 @@ class JobSearch:
             print()
 
     """
+    ============================================
     Returns a list of pairs of the most frequently used words in the job descriptions related to the specified
     locations and positions.
 
     List contents are limited by displayCount, if there is no limit specified (-1), wordFrequency will return all words 
     and their frequency
+    ============================================
     """
+    
     def getWordFrequency(self, displayCount: int = 0, blacklist: List[str] = None) -> List[Tuple[Any, int]]:
         if blacklist is None:
             blacklist = []
@@ -266,12 +288,19 @@ class JobSearch:
                     break
 
         return frequencyCounts.most_common()
-
+    
+    """
+    ============================================
+    Returns how often a word has been seen in a JobSearch
+    ============================================
+    """
+    
     def getWord(self, word: str) -> int:
         return self.wordCounter[word.lower()]
 
     """
-    resumeWeights is a txt document listing key words and relative weights
+    ============================================
+    resumeWeights is a txt document (or Object, I haven't decided) listing keywords and relative weights
     
     Example:
     intern internship 1.0 # If intern or internship are found, the relative weight is applied, does not double count
@@ -283,6 +312,8 @@ class JobSearch:
     fall . 5
     
     Implementation is TBD
+    ============================================
     """
+    
     def companyFit(self, resumeWeights: str) -> List[Tuple[str, float]]:
         pass
