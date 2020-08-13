@@ -73,7 +73,7 @@ Reliability: 434 | Analytical: 421 | Passionate: 412
 Collaborative: 407 | Database: 407 | C#: 401
 Independently: 393 | Flexible: 381 | Fast-paced: 380
 Communicate: 369 | Positive: 369 | Bachelor's: 368
-Dyanamic: 357 | Collaboration: 354 | Interpersonal: 331
+Dynamic: 357 | Collaboration: 354 | Interpersonal: 331
 Facebook: 361 | Scaling: 316 | Algorithms: 299
 Motivated: 275 | Driven: 240 | Linux: 231
 JavaScript: 222 | AI: 219 | Initiative: 208
